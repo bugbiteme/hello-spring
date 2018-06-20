@@ -11,12 +11,7 @@ This README file will provide instructions for building
 and running locally, as well as instructions for 
 deploying to OpenShift using S2I (source to image) methods
 
-*On a side note, you can easily spin up a Spring Boot project yourself 
-from scratch by using the ["SPRING INITIALIZR"](http://start.spring.io). 
-This will generate the maven pom.xmlfile and initiial 
-directory structure that can compile and run right away, 
-including setup for JUnit testing, which is demonstrated 
-here in `hello-spring`.*
+*On a side note, you can easily spin up a Spring Boot project yourself from scratch by using the ["SPRING INITIALIZR"](http://start.spring.io). This will generate the maven pom.xml file and initial project directory structure that can compile and run right away, including setup for JUnit testing, which is demonstrated here in `hello-spring`.*
 
 This project is set up to use maven to build the jar 
 executable, so ensure that is installed on your build 
