@@ -172,4 +172,32 @@ Try the rest API:
  `{"greeting":"Hello World!"}`
 
 
+ ## Setting up a Jenkins pipeline (not reccomended yet)
+ 
+It is best to clone this repo over to your own account so you can make changes to this code and deploy them to your environment.
+
+Clone this repository to your own account
+`oc new-project hello-jenkins`
+`oc create -f openjdk-s2i-imagestream.json` (if needed)
+`oc new-app https://github.com/<your repo>/hello-spring.git --name hello --image-stream=redhat-openjdk18-openshift`
+`oc expose svc/hello`
+`oc get route hello`
+
+test that everything is working:
+
+`curl hello-hello-spring.<IP ADDRESS>.nip.io/api`
+ 
+ Output:
+ 
+ `{"greeting":"Hello World!"}`
+ 
+ oc set triggers dc/hello --manual
+ oc new-app jenkins-ephemeral
+ oc new-app . --name=hello-pipeline --strategy=pipeline (be sure you are in the project root directory)
+ 
+The above command creates a new build config of type pipeline which is automatically configured to fetch the Jenkinsfile from the Git repository of the current folder (hello-spring  Git repository) and execute it on Jenkins.
+
+Go OpenShift Web Console inside the hello-jenkins project and from the left sidebar click on Builds » Pipelines
+
+
 
