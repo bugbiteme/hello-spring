@@ -77,7 +77,7 @@ When you use maven to package or test, you can see if the test passes or fails (
 ~~~
 
 
-To see the unit test fail, edit the string in the `index(...)` function in the `HelloController` class.
+To see the unit test fail, edit `String greeting`string in the `HelloController` class.
 
 Example:
 
@@ -85,8 +85,11 @@ Example:
 @RestController
 public class HelloController {
 
+	String greeting = "Hello Foo!";
+
     @RequestMapping("/")
-    public String index() { return "Hello Foo!"; }
+    public String index() { return greeting; }
+    ...
 
 }
 ~~~
@@ -120,43 +123,47 @@ create a new OpenShift project to run your hello-spring
 
 `oc new-project hello-spring`
 
-If your OpenShift environment doesn't already have a java image (as in some versions of minishift lack, for some strange reason) you can create one in the OpenShift project by downloading the `openjdk-s2i-imagestream.json` file from here and running"
+The Java S2I image enables developers to automatically build, deploy and run java applications on demand, in OpenShift Container Platform, by simply specifying the location of their application source code or compiled java binaries. In many cases, these java applications are bootable “fat jars” that include an embedded version of an application server and other frameworks (spring-boot in this instance).
 
-##TODO - NEED TO VALIDATE EVERYTHING BELOW THIS LINE!!!
+If your OpenShift environment doesn't already have a java image (as in some versions of minishift lack, for some strange reason) you can create one in the OpenShift project by downloading the `openjdk-s2i-imagestream.json` file from here and running"
 
 `oc create -f openjdk-s2i-imagestream.json`
 
-The Java S2I image enables developers to automatically build, deploy and run java applications on demand, in OpenShift Container Platform, by simply specifying the location of their application source code or compiled java binaries. In many cases, these java applications are bootable “fat jars” that include an embedded version of an application server and other frameworks (wildfly-swarm in this instance). 
-
-Before we start using the Java S2I image we need to tell OpenShift how to find it. This is done by creating an image stream. The image stream definition can be downloaded and used. To add the image stream to your project run the following command:
-
-`$ oc create -f openjdk-s2i-imagestream.json`
+This will tell OpenShift how to find the Java S2I image. 
 
 Now you can deploy the service from github
 
-`$ oc new-app https://github.com/bugbiteme/catalog-spring-boot.git --name catalog --image-stream=redhat-openjdk18-openshift`
+`oc new-app https://github.com/bugbiteme/hello-spring.git --name hello --image-stream=redhat-openjdk18-openshift`
 
-A build gets created and starts building the Node.js Web UI container image. You can see the build logs using OpenShift Web Console or OpenShift CLI:
+A build gets created and starts compiling and creating java container image. You can see the build logs using OpenShift Web Console or OpenShift CLI:
 
-`$ oc logs -f bc/catalog`
+`oc logs -f bc/hello`
 
-In order to access the Web UI from outside (e.g. from a browser), it needs to get added to the load balancer. Run the following command to add the Web UI service to the built-in HAProxy load balancer in OpenShift.
+Some of this should look similar from when you built the applicatin locally, including unit test status!
+
+Once the container image has been built, it can be deployed, scaled and added to your CI/CD pipeline.
+
+In order to access the `hello` app (e.g. from a browser), it needs to be exposed and added to the load balancer. Run the following command to add the Web UI service to the built-in HAProxy load balancer in OpenShift.
 
 ~~~
-$ oc expose svc/catalog
-$ oc get route catalog
+oc expose svc/hello
+oc get route hello
 ~~~
-
-While you are waiting for the deploy command to complete, you can log into the OpenShift web consol and check the progress of your deployment, and even view the build and deployment logs, which should look very similar to the messages seen when running the service locally.
-
+ 
+ Output:
+ 
+~~~
+route "hello" exposed
+NAME      HOST/PORT                                  PATH      SERVICES   PORT       TERMINATION   WILDCARD
+hello     hello-hello-spring.192.168.99.100.nip.io             hello      8080-tcp                 None
+~~~
 
 ### Validate 
-Once the service has been deployed, you can get the url by running
-
-`$ oc get route`
-
 validate it is running using curl (or a web browser)
 
-`curl http://CATALOGSERVICEURL/api/catalog 
- output
+`curl http://hello-hello-spring.<IP ADDRESS>.nip.io`
+ 
+ Output:
+ 
+ `Hello World!`
 
