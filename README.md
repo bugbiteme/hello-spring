@@ -161,9 +161,20 @@ hello     hello-hello-spring.192.168.99.100.nip.io             hello      8080-t
 ### Validate 
 validate it is running using curl (or a web browser)
 
-`curl http://hello-hello-spring.<IP ADDRESS>.nip.io`
+`curl hello-hello-spring.<IP ADDRESS>.nip.io`
  
  Output:
  
  `Hello World!`
+ 
+
+Try the rest API:
+
+`curl hello-hello-spring.<IP ADDRESS>.nip.io/api`
+ 
+ Output:
+ 
+ `{"greeting":"Hello World!"}`
+
+
 
