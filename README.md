@@ -1,28 +1,22 @@
 # hello-spring
 
-This is a very basic "Hello World!" web app using the
-Spring Boot frameork:
+This is a very basic "Hello World!" web app using the Spring Boot java frameork:
 [http://spring.io](http://spring.io).
 
-**hello-spring** inteded for use with OpenShift workshops, but can be used however you want. 
+I intended **hello-spring** to be used with OpenShift workshops, but this can be used however you want. 
 This project also demonstrates JUnit testing.
 
-This README file will provide instructions for building 
-and running locally, as well as instructions for 
-deploying to OpenShift using S2I (source to image) methods
+This README file will provide instructions for building and running the service locally, as well as instructions for deploying to OpenShift using S2I (source to image) and other methods.
 
 *On a side note, you can easily spin up a Spring Boot project yourself from scratch by using the ["SPRING INITIALIZR"](http://start.spring.io). This will generate the maven pom.xml file and initial project directory structure that can compile and run right away, including setup for JUnit testing, which is demonstrated here in `hello-spring`.*
 
-This project is set up to use maven to build the jar 
-executable, so ensure that is installed on your build 
-system ([maven](https://maven.apache.org/install.html)). 
+This project is set up to use maven to build the jar executable, so ensure that it is installed on your build system ([maven](https://maven.apache.org/install.html)). 
 
 **Note**:  `yum`, `apt-get`, `brew install`, 
 `chocolatey`, etc.. can all be used to install maven.
 
 ## Building and running locally
-Once you clone the project to your local system, you 
-can build and test locally by running:
+Once you clone the project to your local system, you can build and test locally by running:
 
 `mvn clean test` - for unit testing
 
@@ -31,21 +25,22 @@ which you can run locally
 
 `mvn spring-boot:run` - to build and run your code in one step.
 
-
 After successful compilation, you will find the executable jar in the `target/` directory.
 
 You can also run the `hello` service with the following command from the project root directory:
 
 `java -jar target/*.jar`
 
-Once running, point your web browser to `localhost:8080` or run the command:
+Once the service is running, point your web browser to `localhost:8080` or run the command:
 
 `curl localhost:8080` 
 
 on the command line to see the welcome message.
 
+Note: Try `localhost:8080/api` as well!
+
 ## Unit testing
-The test class `HelloControllerTest` contains one unit test to ensure the application returns the string "Hello World!"
+The test class `HelloControllerTest` contains a unit test to ensure the application returns the string "Hello World!"
 
 ~~~
 @Test
@@ -117,15 +112,15 @@ Fix your code and verify it will pass testing once again.
 
 ## Deploy code to OpenShift using S2I
 
-create a new OpenShift project to run your hello-spring
+create a new OpenShift project to run your hello-spring application/service
 
 `oc new-project hello-spring`
 
 The Java S2I image enables developers to automatically build, deploy and run java applications on demand, in OpenShift Container Platform, by simply specifying the location of their application source code or compiled java binaries. In many cases, these java applications are bootable “fat jars” that include an embedded version of an application server and other frameworks (spring-boot in this instance).
 
-### Getting the image stream from here
+### Getting the image stream 
 
-If your OpenShift environment doesn't already have a java image (as in some versions of minishift lack, for some strange reason) you can create one in the OpenShift project by importing an image stream. 
+If your OpenShift environment doesn't already have a java image present in its catalog (as in some versions of minishift, for some reason) you can create one in the OpenShift project by importing an image stream. 
 
 ### Getting the image stream from an official source
 
@@ -133,7 +128,7 @@ Go to [https://access.redhat.com/containers](https://access.redhat.com/container
 
 *Builder Image -> Java Application -> Get Latest Image -> Choose your platform: Red Hat OpenShift*
 
-From here you can copy and past the import command provided:
+From here you can copy and paste the import command provided:
 
 example `oc import-image my-redhat-openjdk-18/openjdk18-openshift --from=registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift —confirm`
 
@@ -152,7 +147,7 @@ Now you can deploy the service from github
 
 `oc new-app https://github.com/bugbiteme/hello-spring.git --name hello --image-stream=openjdk18-openshift`
 
-A build gets created and starts compiling and creating java container image. You can see the build logs using OpenShift Web Console or OpenShift CLI:
+A build gets created and starts compiling and creating the java container from the image. You can follow the build logs using OpenShift Web Console or OpenShift CLI command:
 
 `oc logs -f bc/hello`
 
@@ -178,7 +173,7 @@ hello     hello-hello-spring.192.168.99.100.nip.io             hello      8080-t
 ### Validate 
 validate it is running using curl (or a web browser)
 
-`curl hello-hello-spring.<IP ADDRESS>.nip.io`
+`curl hello-hello-spring.<IP ADDRESS>`
  
  Output:
  
@@ -187,7 +182,7 @@ validate it is running using curl (or a web browser)
 
 Try the rest API:
 
-`curl hello-hello-spring.<IP ADDRESS>.nip.io/api`
+`curl hello-hello-spring.<IP ADDRESS>/api`
  
  Output:
  
@@ -195,7 +190,7 @@ Try the rest API:
 
 ## Deploying prebuilt jar from local build
 
-In some instances, you may want to compile and test the code locally, in this case, from a new project with no application deployed, use the maven fabric8 plugin
+In some instances, you may want to compile and test the code locally and deploy the localy built jar/war, in this case, from a new OpenShift project with no application deployed, use the maven fabric8 plugin to build and deploy your application/service:
 
 `mvn fabric8:deploy`
 
@@ -233,7 +228,7 @@ and
 			</plugin>
 ~~~
 
-## Setting up a Jenkins pipeline (BELOW IS A WORK IN PROGRESS)
+## Setting up a Jenkins pipeline (BELOW IS A WORK IN PROGRESS AND NOT INTENDED FOR USE!!!)
  
 It is best to clone this repo over to your own account so you can make changes to this code and deploy them to your environment.
 
