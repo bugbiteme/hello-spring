@@ -29,11 +29,16 @@ can build and test locally by running:
 `mvn clean package` - to compile a *jar executable 
 which you can run locally
 
+`mvn spring-boot:run` - to build and run your code in one step.
+
+
 After successful compilation, you will find the executable jar in the `target/` directory.
 
-You can runn `hello` with the following command from the project root directory:
+You can also run the `hello` service with the following command from the project root directory:
 
 `java -jar target/*.jar`
+
+... or better yet, use the
 
 Once running, point your web browser to `localhost:8080` or run the command:
 
@@ -171,8 +176,7 @@ Try the rest API:
  
  `{"greeting":"Hello World!"}`
 
-
- ## Setting up a Jenkins pipeline (not reccomended yet)
+ ## Setting up a Jenkins pipeline (BELOW IS A WORK IN PROGRESS)
  
 It is best to clone this repo over to your own account so you can make changes to this code and deploy them to your environment.
 
