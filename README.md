@@ -218,7 +218,7 @@ There are directives in `pom.xml` which will tell allow for the fabric8 plugin t
 and
 
 ~~~
-<!--fabric8 info-->
+           <!--fabric8 info-->
 			<plugin>
 				<groupId>io.fabric8</groupId>
 				<artifactId>fabric8-maven-plugin</artifactId>
