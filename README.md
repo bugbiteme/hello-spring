@@ -38,8 +38,6 @@ You can also run the `hello` service with the following command from the project
 
 `java -jar target/*.jar`
 
-... or better yet, use the
-
 Once running, point your web browser to `localhost:8080` or run the command:
 
 `curl localhost:8080` 
