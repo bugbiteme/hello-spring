@@ -198,34 +198,34 @@ There are directives in `pom.xml` which will tell allow for the fabric8 plugin t
 
 ~~~
    <properties>
+	...
+	<!--fabric8 info-->
+	<fabric8.version>2.3.4</fabric8.version>
+	<spring.k8s.bom.version>0.2.0.RELEASE</spring.k8s.bom.version>
+	<k8s.client.version>2.4.1</k8s.client.version>
+	<fabric8.maven.plugin.version>3.5.32</fabric8.maven.plugin.version>
 		...
-		<!--fabric8 info-->
-		<fabric8.version>2.3.4</fabric8.version>
-		<spring.k8s.bom.version>0.2.0.RELEASE</spring.k8s.bom.version>
-		<k8s.client.version>2.4.1</k8s.client.version>
-		<fabric8.maven.plugin.version>3.5.32</fabric8.maven.plugin.version>
-		...
-	</properties>
+   </properties>
 ~~~
 
 and
 
 ~~~
            <!--fabric8 info-->
-			<plugin>
-				<groupId>io.fabric8</groupId>
-				<artifactId>fabric8-maven-plugin</artifactId>
-				<version>${fabric8.maven.plugin.version}</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>resource</goal>
-							<goal>build</goal>
-						</goals>
-					</execution>
-				</exec>
-				...
-			</plugin>
+	   <plugin>
+		<groupId>io.fabric8</groupId>
+		<artifactId>fabric8-maven-plugin</artifactId>
+		<version>${fabric8.maven.plugin.version}</version>
+		<executions>
+			<execution>
+				<goals>
+					<goal>resource</goal>
+					<goal>build</goal>
+				</goals>
+			</execution>
+		</exec>
+		...
+	  </plugin>
 ~~~
 
 ## Setting up a Jenkins pipeline (BELOW IS A WORK IN PROGRESS AND NOT INTENDED FOR USE!!!)
