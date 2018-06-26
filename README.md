@@ -120,7 +120,7 @@ The Java S2I image enables developers to automatically build, deploy and run jav
 
 Now deploy the service from github
 
-`oc new-app https://github.com/bugbiteme/hello-spring.git --name hello --image-stream=openjdk18-openshift`
+`oc new-app https://github.com/bugbiteme/hello-spring.git --name hello --image-stream=redhat-openjdk18-openshift:1.2`
 
 A build gets created and starts compiling and creating the java container from the image. You can follow the build logs using OpenShift Web Console or OpenShift CLI command:
 
