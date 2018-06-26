@@ -118,32 +118,7 @@ create a new OpenShift project to run your hello-spring application/service
 
 The Java S2I image enables developers to automatically build, deploy and run java applications on demand, in OpenShift Container Platform, by simply specifying the location of their application source code or compiled java binaries. In many cases, these java applications are bootable “fat jars” that include an embedded version of an application server and other frameworks (spring-boot in this instance).
 
-### Getting the image stream 
-
-If your OpenShift environment doesn't already have a java image present in its catalog (as in some versions of minishift, for some reason) you can create one in the OpenShift project by importing an image stream. 
-
-### Getting the image stream from an official source
-
-Go to [https://access.redhat.com/containers](https://access.redhat.com/containers)
-
-*Builder Image -> Java Application -> Get Latest Image -> Choose your platform: Red Hat OpenShift*
-
-From here you can copy and paste the import command provided:
-
-example `oc import-image my-redhat-openjdk-18/openjdk18-openshift --from=registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift —confirm`
-
-This will tell OpenShift how to find the Java S2I image. 
-
-validate the name of the image stream:
-
-`oc get is`
-
-~~~
-NAME                  DOCKER REPO                                       TAGS      UPDATED
-openjdk18-openshift   172.30.1.1:5000/hello-maven/openjdk18-openshift   latest    20 minutes ago
-~~~
-
-Now you can deploy the service from github
+Now deploy the service from github
 
 `oc new-app https://github.com/bugbiteme/hello-spring.git --name hello --image-stream=openjdk18-openshift`
 
@@ -151,7 +126,7 @@ A build gets created and starts compiling and creating the java container from t
 
 `oc logs -f bc/hello`
 
-Some of this should look similar from when you built the applicatin locally, including unit test status!
+Some of this should look similar from when you built the application locally, including unit test status!
 
 Once the container image has been built, it can be deployed, scaled and added to your CI/CD pipeline.
 
@@ -187,6 +162,30 @@ Try the rest API:
  Output:
  
  `{"greeting":"Hello World!"}`
+### Getting the image stream if not present in OpenShift
+
+If your OpenShift environment doesn't already have a java image present in its catalog (as in some versions of minishift, for some reason) you can create one in the OpenShift project by importing an image stream. 
+
+### Getting the image stream from an official source
+
+Go to [https://access.redhat.com/containers](https://access.redhat.com/containers)
+
+*Builder Image -> Java Application -> Get Latest Image -> Choose your platform: Red Hat OpenShift*
+
+From here you can copy and paste the import command provided:
+
+example `oc import-image my-redhat-openjdk-18/openjdk18-openshift --from=registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift -—confirm`
+
+This will tell OpenShift how to find the Java S2I image. 
+
+validate the name of the image stream:
+
+`oc get is`
+
+~~~
+NAME                  DOCKER REPO                                       TAGS      UPDATED
+openjdk18-openshift   172.30.1.1:5000/hello-maven/openjdk18-openshift   latest    20 minutes ago
+~~~
 
 ## Deploying prebuilt jar from local build
 
