@@ -228,12 +228,18 @@ and
 			</plugin>
 ~~~
 
-## Setting up a Jenkins pipeline (BELOW IS A WORK IN PROGRESS AND NOT INTENDED FOR USE!!!)
+## Setting up a Jenkins pipeline (WORK IN PROGRESS)
+
+THis only works in minishift 3.3 (3.4 won't work)
+minishift 3.3 is included in Red Heat Developer Suite 2.2.0
+
  
 Since minishift cannot be access from external sources (such as public github) we will first start off by setting up local git repository using [Gogs](https://gogs.io)
 
 `oc new-project gogs`
+
 `oc new-app -f http://bit.ly/openshift-gogs-template --param=HOSTNAME=gogs-gogs.<YOUR IP>.nip.io`
+
 `oc get route gogs`
 
 Once deployed:
@@ -309,8 +315,8 @@ Remove the hello deployment triggers:
 Deploy a Jenkins server using the provided template and container image that comes out-of-the-box with OpenShift:
 
 ~~~
-oc new-app openshift/jenkins-2-centos7
-oc logs -f dc/jenkins-2-centos7
+oc new-app jenkins-ephemeral
+oc logs -f dc/jenkins
 
 --> Scaling jenkins-2-centos7-1 to 1
 --> Success
@@ -334,8 +340,18 @@ pipeline {
   stages {
     stage('Build JAR') {
       steps {
-        sh "mvn package"
+        sh "mvn -B -DskipTests clean package"
         stash name:"jar", includes:"target/hello-0.0.1-SNAPSHOT.jar"
+      }
+    }
+    stage('Test') {
+      steps {
+        sh 'mvn test'
+      }
+      post {
+        always {
+          junit 'target/surefire-reports/*.xml'
+        }
       }
     }
     stage('Build Image') {
@@ -365,7 +381,8 @@ pipeline {
 
 This pipeline has three stages:
 
-- Build JAR: to build and test the jar file using Maven
+- Build JAR: to build jar file using Maven
+- Test: Run junit testing on build
 - Build Image: to build a container image ("hello") from the JAR archive using OpenShift S2I
 - Deploy: to deploy the "hello" container image in the current project
 
@@ -385,3 +402,64 @@ oc new-app . --name=hello-pipeline --strategy=pipeline
     Build scheduled, use 'oc logs -f bc/hello-pipeline' to track its progress.
     Run 'oc status' to view your app.
 ~~~
+
+Once complete, the pipeline for the hello app has been configured to build and deploy code from the gogs repository
+
+You can view and manaually run the pipeline from the hello-spring project:
+
+Builds -> Pipelines
+
+Note: If you want to make addtions/edits to the pipeline, simply edit *Jenkinsfile* contained in this project and push it to the gogs repo.
+
+### Automatically Run the Pipeline on Every Code Change/Commit
+#### NOTE: THE FOLLOWING IS STILL BEING DEVELOPED AND MAY NOT WORK CORRECTLY. I'M WORKING ON IT!!! (-Leon)
+
+Configure the pipeline you just created to run every time you commit/push a code change the git repo.
+
+Manually triggering the deployment pipeline to run is useful but the real goes is to be able to build and deploy every change in code or configuration at least to lower environments (e.g. dev and test) and ideally all the way to production with some manual approvals in-place.
+
+In order to automate triggering the pipeline, you can define a webhook on your Git repository to notify OpenShift on every commit that is made to the Git repository and trigger a pipeline execution.
+
+You can get see the webhook links for your hello-pipeline using the describe command.
+
+~~~
+describe bc hello-pipeline
+
+
+Name:		hello-pipeline
+Namespace:	hello-spring
+Created:	22 minutes ago
+Labels:		app=hello-pipeline
+Annotations:	openshift.io/generated-by=OpenShiftNewApp
+Latest Version:	2
+
+Strategy:		JenkinsPipeline
+URL:			http://gogs-gogs.192.168.99.100.nip.io/leon/hello-spring.git
+Ref:			master
+Jenkinsfile path:	Jenkinsfile
+
+Build Run Policy:	Serial
+Triggered by:		Config
+Webhook GitHub:
+	URL:	https://192.168.99.100:8443/apis/build.openshift.io/v1/namespaces/hello-spring/buildconfigs/hello-pipeline/webhooks/Gwl9kmgTzyw1LC1pnQME/github
+Webhook Generic:
+	URL:		https://192.168.99.100:8443/apis/build.openshift.io/v1/namespaces/hello-spring/buildconfigs/hello-pipeline/webhooks/nzz7rtxyANqUv2ekIgzo/generic
+	AllowEnv:	false
+
+~~~
+
+You can also see the webhooks in the OpenShift Web Console by going to Build » Pipelines, click on the pipeline and go to the Configurations tab.
+
+Copy the “Generic” web hook and go into the Gogs hello project and click settings
+
+
+On the left menu, click on Webhooks and then on Add Webhook button and then Gogs.
+
+Create a webhook with the following details:
+
+* Payload URL: paste the Generic webhook url you copied from the hello-pipeline
+* Content type: application/json
+
+
+Click on *Add Webhook*.
+
