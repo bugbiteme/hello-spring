@@ -467,3 +467,5 @@ Create a webhook with the following details:
 
 Click on *Add Webhook*.
 
+Once the webook has been added, the pipeline will run each time you push code to the git repo!
+
