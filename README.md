@@ -1,12 +1,13 @@
 # hello-spring
 
-This is a very basic "Hello World!" web app using the Spring Boot java frameork:
+This is a simple "Hello World!" web app using the Spring Boot java framework:
 [http://spring.io](http://spring.io).
 
 I intended **hello-spring** to be used with OpenShift workshops, but this can be used however you want. 
-This project also demonstrates JUnit testing.
 
-This README file will provide instructions for building and running the service locally, as well as instructions for deploying to OpenShift using S2I (source to image) and other methods.
+This project also demonstrates JUnit testing. 
+
+This README file will provide instructions for building and running the service locally, as well as instructions for deploying to OpenShift using S2I (source to image) and setting up a build pipeline. 
 
 *On a side note, you can easily spin up a Spring Boot project yourself from scratch by using the ["SPRING INITIALIZR"](http://start.spring.io). This will generate the maven pom.xml file and initial project directory structure that can compile and run right away, including setup for JUnit testing, which is demonstrated here in `hello-spring`.*
 
@@ -130,7 +131,7 @@ Go to [https://access.redhat.com/containers](https://access.redhat.com/container
 
 From here you can copy and paste the import command provided:
 
-example `oc import-image my-redhat-openjdk-18/openjdk18-openshift --from=registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift —confirm`
+example `oc import-image my-redhat-openjdk-18/openjdk18-openshift --from=registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift —-confirm`
 
 This will tell OpenShift how to find the Java S2I image. 
 
@@ -151,7 +152,7 @@ A build gets created and starts compiling and creating the java container from t
 
 `oc logs -f bc/hello`
 
-Some of this should look similar from when you built the applicatin locally, including unit test status!
+Some of this should look similar from when you built the application locally, including unit test status!
 
 Once the container image has been built, it can be deployed, scaled and added to your CI/CD pipeline.
 
@@ -162,7 +163,7 @@ oc expose svc/hello
 oc get route hello
 ~~~
  
- Output:
+Output:
  
 ~~~
 route "hello" exposed
@@ -190,7 +191,7 @@ Try the rest API:
 
 ## Deploying prebuilt jar from local build
 
-In some instances, you may want to compile and test the code locally and deploy the localy built jar/war, in this case, from a new OpenShift project with no application deployed, use the maven fabric8 plugin to build and deploy your application/service:
+In some scenarios, you may want to compile and test the code locally and deploy the localy built jar/war, in this case, from a new OpenShift project with no application deployed, use the maven fabric8 plugin to build and deploy your application/service:
 
 `mvn fabric8:deploy`
 
@@ -230,11 +231,11 @@ and
 
 ## Setting up a Jenkins pipeline (WORK IN PROGRESS)
 
-THis only works in minishift 3.3 (3.4 won't work)
-minishift 3.3 is included in Red Heat Developer Suite 2.2.0
+This will work in minishift 3.3 (3.4 won't work)
+minishift 3.3 is included in Red Hat Developer Suite 2.2.0
 
  
-Since minishift cannot be access from external sources (such as public github) we will first start off by setting up local git repository using [Gogs](https://gogs.io)
+Since minishift cannot be access from external sources (such as public github) first start off by setting up local git repository using [Gogs](https://gogs.io)
 
 `oc new-project gogs`
 
@@ -280,7 +281,7 @@ ctrl-c to kill app
 
 Any changes you commit will go to the repo on gogs
 
-Create a new verion of hello-spring project
+Create a new version of hello-spring project
 
 `oc new-project hello-spring-pipeline`
 
@@ -299,9 +300,9 @@ NAME      HOST/PORT                                    PATH      SERVICES   PORT
 hello     hello-hello-pipeline.192.168.99.100.nip.io             hello      8080-tcp                 None
 ~~~
 
-Verify it is running correctly and that the route is accessible:
+Verify the application is running correctly and that the route is accessible:
 
-`curl hello-hello-spring-pipeline.192.168.99.100.nip.io/api`
+ex. `curl hello-hello-spring-pipeline.192.168.99.100.nip.io/api`
 
 `{"greeting":"Hello World!"}`
 
@@ -313,9 +314,12 @@ OpenShift automates deployments using deployment triggers that react to changes 
 
 Remove the hello deployment triggers:
 
-`oc  set triggers dc/hello --manual`
 
-`deploymentconfig "hello" updated`
+~~~
+oc  set triggers dc/hello --manual
+
+deploymentconfig "hello" updated
+~~~
 
 Deploy a Jenkins server using the provided template and container image that comes out-of-the-box with OpenShift:
 
@@ -329,9 +333,9 @@ oc logs -f dc/jenkins
 
 *Note: it may take a few minutes before the Jenkens server is accessible.*
 
-*Note: If this doesn't work, try to deploy via the OpenShift Admin GUI*
+*Note: If this doesn't work, try to deploy via the OpenShift Web GUI*
 
-Ensure the Jenkens container/server is up and running before you proceed.
+Ensure the Jenkens container/server is up and running before you proceed by logging into it.
 
 Take a look at the Jenkinsfile included with this cloned project
 
@@ -391,9 +395,9 @@ This pipeline has three stages:
 - Build Image: to build a container image ("hello") from the JAR archive using OpenShift S2I
 - Deploy: to deploy the "hello" container image in the current project
 
-The next steps will deploy the Jenkinsfile to the CI/CD configuration for this project:
+The next steps will deploy the Jenkinsfile to the build and deploy pipeline configuration for this project:
 
-After Jenkins is deployed and is running (verify in web console), create a deployment pipeline by running the following command within the hello-spring folder:
+After Jenkins is deployed and is running (verify in web console), create a deployment pipeline by running the following command within the hello-pipeline folder:
 
 oc new-app . --name=hello-pipeline --strategy=pipeline
 
@@ -408,7 +412,7 @@ oc new-app . --name=hello-pipeline --strategy=pipeline
     Run 'oc status' to view your app.
 ~~~
 
-Once complete, the pipeline for the hello app has been configured to build and deploy code from the gogs repository
+Once complete, the pipeline for the hello app has been configured to build and deploy code from the gogs/git repository
 
 You can view and manaually run the pipeline from the hello-spring project:
 
@@ -420,7 +424,7 @@ Note: If you want to make addtions/edits to the pipeline, simply edit *Jenkinsfi
 
 Configure the pipeline you just created to run every time you commit/push a code change the git repo.
 
-Manually triggering the deployment pipeline to run is useful but the real goes is to be able to build and deploy every change in code or configuration at least to lower environments (e.g. dev and test) and ideally all the way to production with some manual approvals in-place.
+Manually triggering the deployment pipeline to run is useful but the real goal is to be able to build and deploy every change in code or configuration at least to lower environments (e.g. dev and test) and ideally all the way to production with some manual approvals in-place.
 
 In order to automate triggering the pipeline, you can define a webhook on your Git repository to notify OpenShift on every commit that is made to the Git repository and trigger a pipeline execution.
 
@@ -454,14 +458,14 @@ Webhook Generic:
 
 You can also see the webhooks in the OpenShift Web Console by going to Build » Pipelines, click on the pipeline and go to the Configurations tab.
 
-Copy the “Generic” web hook and go into the Gogs hello project and click settings
+Copy the “Generic” web hook and go into the Gogs *hello-spring* project and click *settings*
 
 
-On the left menu, click on Webhooks and then on Add Webhook button and then Gogs.
+On the left menu, click *Webhooks* and then the *Add Webhook* button and then select *Gogs*.
 
 Create a webhook with the following details:
 
-* Payload URL: paste the Generic webhook url you copied from the hello-pipeline
+* Payload URL: paste the "Generic" webhook url you copied from the hello-pipeline project
 * Content type: application/json
 
 
