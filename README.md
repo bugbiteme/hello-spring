@@ -238,7 +238,12 @@ Since minishift cannot be access from external sources (such as public github) w
 
 `oc new-project gogs`
 
-`oc new-app -f http://bit.ly/openshift-gogs-template --param=HOSTNAME=gogs-gogs.<YOUR IP>.nip.io`
+~~~
+oc new-app -f http://bit.ly/openshift-gogs-persistent-template \
+    --param=HOSTNAME=gogs-gogs.$(minishift ip).nip.io \
+    --param=GOGS_VERSION=0.9.113 \
+    --param=SKIP_TLS_VERIFY=true 
+~~~
 
 `oc get route gogs`
 
@@ -411,8 +416,7 @@ Builds -> Pipelines
 
 Note: If you want to make addtions/edits to the pipeline, simply edit *Jenkinsfile* contained in this project and push it to the gogs repo.
 
-### Automatically Run the Pipeline on Every Code Change/Commit
-#### NOTE: THE FOLLOWING IS STILL BEING DEVELOPED AND MAY NOT WORK CORRECTLY. I'M WORKING ON IT!!! (-Leon)
+### Automatically Run the Pipeline on Every Code Change/Commit/Push
 
 Configure the pipeline you just created to run every time you commit/push a code change the git repo.
 
