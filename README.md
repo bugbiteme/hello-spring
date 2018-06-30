@@ -349,7 +349,7 @@ error: no match for "jenkins-ephemeral"
 ...
 ~~~
 
-*Run the following from the hello-spring project image-templates directory*
+*Run the following from the hello-spring project directory*
 
 ~~~
 oc create -f images-templates/jenkins-ephemeral-template.json
