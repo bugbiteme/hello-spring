@@ -231,11 +231,11 @@ and
 
 ## Setting up a Jenkins pipeline (WORK IN PROGRESS)
 
-This will work in minishift 3.3 (3.4 won't work)
+This will work in minishift 3.3 . 3.4 won't work out of the box due to a lack of a different jenkins container image template beeing needed. For this section, if you are using 3.4, there is one additional step listed later on, if you run into issues while using 3.4.
+
 minishift 3.3 is included in Red Hat Developer Suite 2.2.0
 
- 
-Since minishift cannot be access from external sources (such as public github) first start off by setting up local git repository using [Gogs](https://gogs.io)
+Since minishift is in a sandbox environment, it cannot be access from external sources (such as public github). The fisrt thing we need to do is set up a local git repository using [Gogs](https://gogs.io). Gogs is an open source/free version of Github that we will be deploying in an openshift project of it's own:
 
 `oc new-project gogs`
 
@@ -249,6 +249,8 @@ oc new-app -f http://bit.ly/openshift-gogs-persistent-template \
 `oc get route gogs`
 
 Once deployed:
+
+- Navigate to the gogs url (from get route)
 
 - Register a new account
 
@@ -279,7 +281,7 @@ curl localhost:8080/api
 
 ctrl-c to kill app
 
-Any changes you commit will go to the repo on gogs
+Any changes you commit will go to your own repo on gogs
 
 Create a new version of hello-spring project
 
@@ -306,11 +308,11 @@ ex. `curl hello-hello-spring-pipeline.192.168.99.100.nip.io/api`
 
 `{"greeting":"Hello World!"}`
 
-### Create an OpenShift Pipeline
+### Here is where we actually create an OpenShift pipeline
 
 OpenShift Pipelines enable creating deployment pipelines using the Jenkinsfile format.
 
-OpenShift automates deployments using deployment triggers that react to changes to the container image or configuration. Since you want to control the deployments instead from the pipeline, you should remove the "hello" app deploy triggers so that building a new "hello" container image won’t automatically result in a new deployment. This will allow the pipeline to decide when a deployment should occur.
+OpenShift automates deployments using deployment triggers that react to changes to the container image or configuration. Since you want to control the deployments just from the pipeline (and not configuration changes), remove the "hello" application deploy triggers so that building a new "hello" container image won’t automatically result in a new deployment. This will allow the pipeline to decide when a deployment should occur.
 
 Remove the hello deployment triggers:
 
@@ -333,13 +335,37 @@ oc logs -f dc/jenkins
 
 *Note: it may take a few minutes before the Jenkens server is accessible.*
 
-*Note: If this doesn't work, try to deploy via the OpenShift Web GUI*
+*Note: If this doesn't work, you may be on minishift 3.4... I have a workaround for this!*
+
+*Note: If you get the following error message*
+
+~~~
+error: Errors occurred while determining argument types:
+
+jenkins-ephemeral as a local directory pointing to a Git repository:  stat jenkins-ephemeral: no such file or directory
+
+Errors occurred during resource creation:
+error: no match for "jenkins-ephemeral"
+...
+~~~
+
+*Run the following from the hello-spring project image-templates directory*
+
+~~~
+oc create -f images-templates/jenkins-ephemeral-template.json
+
+template "jenkins-ephemeral" created
+
+oc new-app jenkins-ephemeral
+~~~
+
+This imports the correct image template of Jenkens needed for this tutorial.
 
 Ensure the Jenkens container/server is up and running before you proceed by logging into it.
 
 Take a look at the Jenkinsfile included with this cloned project
 
-`cat Jenkinsfile`
+`cat pipeline/Jenkinsfile`
 
 ~~~
 pipeline {
@@ -431,7 +457,7 @@ In order to automate triggering the pipeline, you can define a webhook on your G
 You can get see the webhook links for your hello-pipeline using the describe command.
 
 ~~~
-describe bc hello-pipeline
+oc describe bc hello-pipeline
 
 
 Name:		hello-pipeline
@@ -444,7 +470,7 @@ Latest Version:	2
 Strategy:		JenkinsPipeline
 URL:			http://gogs-gogs.192.168.99.100.nip.io/leon/hello-spring.git
 Ref:			master
-Jenkinsfile path:	Jenkinsfile
+Jenkinsfile path:	pipeline/Jenkinsfile
 
 Build Run Policy:	Serial
 Triggered by:		Config
