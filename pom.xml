@@ -24,10 +24,12 @@
 		<java.version>1.8</java.version>
 
 		<!--fabric8 info-->
+		<!--
 		<fabric8.version>2.3.4</fabric8.version>
 		<spring.k8s.bom.version>0.2.0.RELEASE</spring.k8s.bom.version>
 		<k8s.client.version>2.4.1</k8s.client.version>
 		<fabric8.maven.plugin.version>3.5.32</fabric8.maven.plugin.version>
+		-->
 	</properties>
 
 	<dependencies>
@@ -47,12 +49,13 @@
             <version>2.3</version>
             <scope>compile</scope>
         </dependency>
-
+		<!--
 		<dependency>
 			<groupId>io.fabric8</groupId>
 			<artifactId>kubernetes-client</artifactId>
 			<version>${k8s.client.version}</version>
 		</dependency>
+		-->
 
     </dependencies>
 
