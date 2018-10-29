@@ -64,6 +64,7 @@
 			</plugin>
 
 			<!--fabric8 info-->
+			<!--
 			<plugin>
 				<groupId>io.fabric8</groupId>
 				<artifactId>fabric8-maven-plugin</artifactId>
@@ -104,6 +105,7 @@
 					</generator>
 				</configuration>
 			</plugin>
+                        -->
 
 		</plugins>
 	</build>
