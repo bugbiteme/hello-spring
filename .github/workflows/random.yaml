@@ -1,0 +1,24 @@
+name: Manual Trigger Workflow
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Echo Message
+        run: echo "Workflow manually triggered."
+        
+      - name: Set branch name 
+        run: |
+          echo "BRANCH_NAME=$(echo "${{ github.ref }}" | sed 's#refs/heads/##')" >> $GITHUB_ENV
+
+      - name: Create file with content
+        run: |
+            mkdir -p test
+            cd test
+            echo "hello" > testing-file-touch-${{ env.BRANCH_NAME }}.txt
+
+      

@@ -1,0 +1,15 @@
+name: Manual Trigger Workflow run
+
+on:
+  workflow_run:
+    workflows: [Manual Trigger Workflow]
+    types:
+      - completed
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Echo Message copy fuile
+        run: |
+             cp touch testing-file-touch-${{ github.event.workflow_run.head_branch }}.txt new.txt
